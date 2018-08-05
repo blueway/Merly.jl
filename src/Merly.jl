@@ -37,6 +37,7 @@ mutable struct Fram
   notfound::Function
   start::Function
   useCORS::Function
+  use::Function
   webserverfiles::Function
   webserverpath::Function
 end
@@ -107,6 +108,12 @@ function handler(request::HTTP.Messages.Request)
      response.body = getindex(routes, "notfound")(q,request,response)
     end
   end
+  if length(middles)  > 0
+      for middle in middles
+          middle(q,request,response)
+      end
+  end
+
 
   for (key, value) in q.headers
     HTTP.setheader(response,key => value )
@@ -121,11 +128,13 @@ function app()
 global root
 global exten
 global cors
-
+global middles = []
   function useCORS(activate::Bool)
       cors=activate
   end
-
+  function use(middle::Function)
+      push!(middles ,middle)
+  end
   function notfound(text::AbstractString)
       notfound_message= File(text)
   end
@@ -177,7 +186,7 @@ global cors
       end
     end
   end
-  return Fram(notfound,start,useCORS,webserverfiles,webserverpath)
+  return Fram(notfound,start,useCORS,use,webserverfiles,webserverpath)
 end
 end # module
 #HSTS     HTTP.setheader(response,"Strict-Transport-Security" => "max-age=10886400; includeSubDomains; preload"
