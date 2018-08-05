@@ -218,6 +218,10 @@ server.notfound("notfound.html")
 ```julia
 server.useCORS(true)
 ```
+### Middleware
+```julia
+server.use((query,req,res) -> print(query))
+```
 
 ### Bonus
 If you forgot the MIME type of a file you can use the next instruction
