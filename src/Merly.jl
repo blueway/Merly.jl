@@ -16,6 +16,7 @@ include("webserver.jl")
 export app, @page, @route, GET,POST,PUT,DELETE,HEAD,OPTIONS,PATCH,Get,Post,Put,Delete
 
 cors=false::Bool
+middles=[]
 root=pwd()
 if root[end]=='/'
   root=root[1:end-1]
@@ -129,7 +130,7 @@ function app()
 global root
 global exten
 global cors
-global middles = []
+global middles
   function useCORS(activate::Bool)
       cors=activate
   end
