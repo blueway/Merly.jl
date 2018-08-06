@@ -1,6 +1,6 @@
 name = "Merly"
-uuid = "35253fcc-97cc-11e8-19bf-cf21c1dc27c1"
-authors = ["tomaswyz <jackywyz@126.com>"]
+uuid = "5b70daea-9db9-5a46-aedf-2142e553ecc5"
+authors = ["tomaswyz"]
 version = "0.1.1"
 
 [deps]

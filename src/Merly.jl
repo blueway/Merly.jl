@@ -1,3 +1,4 @@
+VERSION >= v"0.7.0-rc2.0" 
 __precompile__()
 module Merly
 import Base.|
