@@ -113,6 +113,10 @@ function handler(request::HTTP.Messages.Request)
             getindex(routes, "notfound")(q,request,response)
         end
     end
+    if isa(body,Dict) 
+        body = JSON.json(body)
+        HTTP.setheader(response,"Content-Type" => "application/json" )
+    end
     response.body = bytes(body)
     if length(middles)  > 0
         for middle in middles

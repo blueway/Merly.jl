@@ -4,6 +4,7 @@ using Test
 # write your own tests here
 server = Merly.app()
 @page "/" "Hello World!"
+@page "/json"  Dict("msg" =>"Hello World!")
 server.start()
 @test server.useCORS(true) == true
 
