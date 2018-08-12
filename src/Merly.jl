@@ -101,7 +101,6 @@ function handler(request::HTTP.Messages.Request)
         HTTP.setheader(response,"Access-Control-Allow-Methods" => "POST,GET,OPTIONS")
     end
 
-    HTTP.setheader(response,"Content-Type" => "text/plain" )
     body = ""
     try
         response.status= 200
@@ -116,6 +115,8 @@ function handler(request::HTTP.Messages.Request)
     if isa(body,Dict) 
         body = JSON.json(body)
         HTTP.setheader(response,"Content-Type" => "application/json" )
+    else
+        HTTP.setheader(response,"Content-Type" => "text/plain" )
     end
     response.body = bytes(body)
     if length(middles)  > 0
