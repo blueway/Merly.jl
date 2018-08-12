@@ -36,7 +36,6 @@ end
 global notfound_message = bytes(
                                 JSON.json(Dict("code" => 404,"msg" =>"NOT FOUND")) 
                                )
-global q=Data(Dict(),"","",Dict())
 
 mutable struct Fram
     notfound::Function
@@ -84,6 +83,7 @@ function handler(request::HTTP.Messages.Request)
     data = split(request.target,"?")
     url=data[1]
     searchroute = request.method*url
+    q=Data(Dict(),"","",Dict())
     try
         q.query= HTTP.queryparams(data[2]);
     catch
