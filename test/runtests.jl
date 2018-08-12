@@ -3,7 +3,8 @@ using Test
 
 # write your own tests here
 server = Merly.app()
-
+@page "/" "Hello World!"
+server.start()
 @test server.useCORS(true) == true
 
 @test server.notfound("<!DOCTYPE html>
