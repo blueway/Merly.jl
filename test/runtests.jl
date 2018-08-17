@@ -5,6 +5,11 @@ using Test
 server = Merly.app()
 @page "/" "Hello World!"
 @page "/json"  Dict("msg" =>"Hello World!")
+@route GET "/get/:data>" begin
+  println("params: ",q.params["data"])
+  "get this back: {{data}}"
+end
+
 server.start()
 @test server.useCORS(true) == true
 
@@ -18,14 +23,11 @@ server.start()
               <body><h1>404, Not found</h1></body>
               </html>"
 
-#=@test @page "/" "Hello World!" == "GET/"
+@test @page "/" "Hello World!" == "GET/"
 
-@test @route GET "/get/:data>" begin
-  println("params: ",q.params["data"])
-  "get this back: {{data}}"
-end =="GET/get/:data>"
 
-@test Post("/data/:nombre>", (q,req,res)->(begin
+
+#=@test Post("/data/:nombre>", (q,req,res)->(begin
          println("body: ",q.body)
          res.headers["Content-Type"]="text/plain"
 

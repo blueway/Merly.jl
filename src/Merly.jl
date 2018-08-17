@@ -68,7 +68,7 @@ function resolveroute(ruta::String)
     end
 end
 
-function processroute_pattern(searchroute::String,request,response)
+function processroute_pattern(q::Data,searchroute::String,request,response)
     q.params, _function  = resolveroute(searchroute)
     respond = _function(q,request,response)
     sal = collect((m.match for m = eachmatch(Regex("{{([a-z])+}}"), respond)))
@@ -107,7 +107,7 @@ function handler(request::HTTP.Messages.Request)
         body = getindex(routes, searchroute)(q,request,response)
     catch
         try
-            body = processroute_pattern(searchroute,request,response)
+            body = processroute_pattern(q,searchroute,request,response)
         catch
             getindex(routes, "notfound")(q,request,response)
         end
