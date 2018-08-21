@@ -165,10 +165,11 @@ function app()
         my_host = get(config, "host", "127.0.0.1")::String
         if ('.' in my_host) host=Sockets.IPv4(my_host) end
         if (':' in my_host) host=Sockets.IPv6(my_host) end
-        http = (req)-> handler(req)
-        myserver= HTTP.Servers.Server(http, stdout)
         @info("Listening on: $(host) : $(port)")
-        return HTTP.Servers.serve(myserver, host, port)
+
+        HTTP.listen(host,port) do request::HTTP.Request
+            return handler(request)
+        end
     end
     return Fram(notfound,start,useCORS,use,webserverfiles,webserverpath)
 end
