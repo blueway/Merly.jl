@@ -1,5 +1,7 @@
 using Merly
 using Test
+using HTTP
+using JSON
 
 # write your own tests here
 server = Merly.app()
@@ -10,7 +12,6 @@ server = Merly.app()
   "get this back: {{data}}"
 end
 
-server.start()
 @test server.useCORS(true) == true
 
 @test server.notfound("<!DOCTYPE html>
@@ -23,21 +24,22 @@ server.start()
               <body><h1>404, Not found</h1></body>
               </html>"
 
-@test @page "/" "Hello World!" == "GET/"
 
+Post("/data", (q,req,res)->(begin
+  println("params: ",q.params)
+  println("query: ",q.query)
+  println("body: ",q.body)
+  q.headers["Content-Type"]= "text/plain"
+  "I did something!"
+end))
 
+@async server.start()
 
-#=@test Post("/data/:nombre>", (q,req,res)->(begin
-         println("body: ",q.body)
-         res.headers["Content-Type"]="text/plain"
+sleep(2)
 
-         "I did something!"
-end)) =="GET/get/:nombre>"
+myjson = Dict("query"=>"data")
+my_headers = HTTP.mkheaders(["Accept" => "application/json","Content-Type" => "application/json"])
+r = HTTP.post("http://localhost:8000/data",my_headers,JSON.json(myjson))
+@test r.status == 200
+@test String(r.body) == "I did something!"
 
-
-@test @route POST|PUT|DELETE "/" begin
-         res.headers["Content-Type"]="text/plain"
-         "I did something!"
-       end == "POST/
-               PUT/
-               DELETE/"=#

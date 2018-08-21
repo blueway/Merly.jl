@@ -33,9 +33,7 @@ mutable struct Data
     body::Any
     headers::Dict
 end
-global notfound_message = bytes(
-                                JSON.json(Dict("code" => 404,"msg" =>"NOT FOUND")) 
-                               )
+global notfound_message = Dict("code" => 404,"msg" =>"NOT FOUND")
 
 mutable struct Fram
     notfound::Function
@@ -84,10 +82,8 @@ function handler(request::HTTP.Messages.Request)
     url=data[1]
     searchroute = request.method*url
     q=Data(Dict(),"","",Dict())
-    try
-        q.query= HTTP.queryparams(data[2]);
-    catch
-    end
+    if (length(data)>1) q.query= HTTP.queryparams(data[2]) end
+
     response = HTTP.Response()
 
     try
@@ -109,7 +105,7 @@ function handler(request::HTTP.Messages.Request)
         try
             body = processroute_pattern(q,searchroute,request,response)
         catch
-            getindex(routes, "notfound")(q,request,response)
+            body = getindex(routes, "notfound")(q,request,response)
         end
     end
     if isa(body,Dict) 
@@ -165,37 +161,14 @@ function app()
 
     function start(config=Dict("host" => "127.0.0.1","port" => 8000)::Dict)
         host= Sockets.IPv4("127.0.0.1")
-        port= 8000
-
-        try
-            host=Sockets.IPv4(get(config, "host", "127.0.0.1")::AbstractString)
-        catch
-            try
-                host=Sockets.IPv6(get(config, "host", "127.0.0.1")::AbstractString)
-            catch
-            end
-        end
-
-        try
-            port=get(config, "port", 8000)::Int
-        catch
-            @info("Port 8000 ")
-        end
-
+        port=get(config, "port", 8000)::Int
+        my_host = get(config, "host", "127.0.0.1")::String
+        if ('.' in my_host) host=Sockets.IPv4(my_host) end
+        if (':' in my_host) host=Sockets.IPv6(my_host) end
         http = (req)-> handler(req)
-
         myserver= HTTP.Servers.Server(http, stdout)
-
-        try
-            #@async run(server, host=IPv4(host), port=port)
-            HTTP.Servers.serve(myserver, host, port)
-        catch
-            try
-                HTTP.Servers.serve(myserver, host, port)
-            catch
-                @warn("Address not valid, check it")
-            end
-        end
+        @info("Listening on: $(host) : $(port)")
+        return HTTP.Servers.serve(myserver, host, port)
     end
     return Fram(notfound,start,useCORS,use,webserverfiles,webserverpath)
 end
